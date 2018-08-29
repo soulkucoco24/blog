@@ -1,12 +1,29 @@
-var express = require("express");
-var router = express.Router();
+const router = require('express').Router();
 
-router.get("/login", function(req, res){
-    return res.send("这是个登陆界面");
-});
+const User = require('../model/user');
 
-router.get("/register", function(req, res){
-    return res.send("这是个注册界面");
-});
+router.route('/register')
+    // 返回注册页面
+    .get(function (req, res) {
+        res.render('account/register.hbs', {title: '注册'});
+    })
+    // 接受用户表单
+    .post(function (req, res, next) {
+        let username = req.body.username || '',
+            password = req.body.password || '';
+
+        if (username.length === 0 || password.length === 0) {
+            return res.status(400).end("argv error");
+        }
+        User.create({
+            username: username,
+            password: password
+        }, function (err) {
+            if (err) {
+                return next(err)
+            }
+            res.status(201).end('register success');
+        });
+    });
 
 module.exports = router;
